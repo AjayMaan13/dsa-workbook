@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# macOS system files
+.DS_Store
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Logs and local environment files
+*.log
+.envrc
+*.env
+
+# VSCode
+.vscode/
+
+# MyPy and other tools
+.mypy_cache/
+.pytest_cache/
+coverage.xml
+htmlcov/
+.cache/
+
+# Notebook output
+*.nbconvert.ipynb
