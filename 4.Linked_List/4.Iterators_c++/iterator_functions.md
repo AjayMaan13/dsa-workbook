@@ -1,342 +1,362 @@
-# C++ Iterator Implementation - Complete Explanation
-
-## What is an Iterator?
-
-Think of an iterator like a **bookmark** in a book. You can:
-- Move to the next page (++)
-- Move to the previous page (--)
-- Read what's on the current page (*)
-- Check if two bookmarks are on the same page (==)
-
-```cpp
-// Example: Using iterators like bookmarks
-std::list<int> myNumbers = {10, 20, 30, 40};
-std::list<int>::iterator bookmark = myNumbers.begin();
-
-cout << *bookmark;  // Reads "10" (first page)
-bookmark++;         // Move to next page
-cout << *bookmark;  // Reads "20" (second page)
-```
-
-## Why Do We Need Iterators?
-
-**Problem**: Different containers store data differently:
-- **Array**: Data stored consecutively in memory
-- **Linked List**: Data scattered, connected by pointers
-- **Tree**: Data in hierarchical structure
-
-**Solution**: Iterators provide a **uniform way** to access any container:
-
-```cpp
-// SAME CODE works for different containers!
-for(auto it = container.begin(); it != container.end(); it++) {
-    cout << *it << endl;  // This works for list, vector, set, etc.
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2fe2bd2c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# C++ Iterator Implementation - Complete Explanation\n",
+    "\n",
+    "## What is an Iterator?\n",
+    "\n",
+    "Think of an iterator like a **bookmark** in a book. You can:\n",
+    "- Move to the next page (++)\n",
+    "- Move to the previous page (--)\n",
+    "- Read what's on the current page (*)\n",
+    "- Check if two bookmarks are on the same page (==)\n",
+    "\n",
+    "```cpp\n",
+    "// Example: Using iterators like bookmarks\n",
+    "std::list<int> myNumbers = {10, 20, 30, 40};\n",
+    "std::list<int>::iterator bookmark = myNumbers.begin();\n",
+    "\n",
+    "cout << *bookmark;  // Reads \"10\" (first page)\n",
+    "bookmark++;         // Move to next page\n",
+    "cout << *bookmark;  // Reads \"20\" (second page)\n",
+    "```\n",
+    "\n",
+    "## Why Do We Need Iterators?\n",
+    "\n",
+    "**Problem**: Different containers store data differently:\n",
+    "- **Array**: Data stored consecutively in memory\n",
+    "- **Linked List**: Data scattered, connected by pointers\n",
+    "- **Tree**: Data in hierarchical structure\n",
+    "\n",
+    "**Solution**: Iterators provide a **uniform way** to access any container:\n",
+    "\n",
+    "```cpp\n",
+    "// SAME CODE works for different containers!\n",
+    "for(auto it = container.begin(); it != container.end(); it++) {\n",
+    "    cout << *it << endl;  // This works for list, vector, set, etc.\n",
+    "}\n",
+    "```\n",
+    "\n",
+    "## const_iterator vs iterator\n",
+    "\n",
+    "### const_iterator = Read-Only Bookmark\n",
+    "```cpp\n",
+    "const_iterator it;\n",
+    "*it = 100;  // ❌ ERROR! Can't modify data\n",
+    "cout << *it; // ✅ OK! Can read data\n",
+    "```\n",
+    "\n",
+    "### iterator = Read-Write Bookmark\n",
+    "```cpp\n",
+    "iterator it;\n",
+    "*it = 100;  // ✅ OK! Can modify data\n",
+    "cout << *it; // ✅ OK! Can read data\n",
+    "```\n",
+    "\n",
+    "### When to Use Which?\n",
+    "```cpp\n",
+    "void printList(const DList<int>& myList) {\n",
+    "    // Function receives const list, so must use const_iterator\n",
+    "    for(auto it = myList.cbegin(); it != myList.cend(); it++) {\n",
+    "        cout << *it;  // Can only read, not modify\n",
+    "    }\n",
+    "}\n",
+    "\n",
+    "void modifyList(DList<int>& myList) {\n",
+    "    // Function receives non-const list, can use iterator\n",
+    "    for(auto it = myList.begin(); it != myList.end(); it++) {\n",
+    "        *it = *it * 2;  // Can modify each element\n",
+    "    }\n",
+    "}\n",
+    "```\n",
+    "\n",
+    "## Class Hierarchy\n",
+    "\n",
+    "```cpp\n",
+    "class const_iterator {  // Base class - read-only operations\n",
+    "    // Can read data but not modify\n",
+    "};\n",
+    "\n",
+    "class iterator : public const_iterator {  // Derived class - adds write ability\n",
+    "    // Inherits read operations + adds write operations\n",
+    "};\n",
+    "```\n",
+    "\n",
+    "**Why this hierarchy?**\n",
+    "```cpp\n",
+    "iterator it1;\n",
+    "const_iterator it2 = it1;  // ✅ OK! iterator can become const_iterator\n",
+    "// const_iterator it3;\n",
+    "// iterator it4 = it3;     // ❌ ERROR! const_iterator cannot become iterator\n",
+    "```\n",
+    "\n",
+    "## Required Operations\n",
+    "\n",
+    "### 1. Increment Operators (++)\n",
+    "\n",
+    "**Prefix ++it** (increment first, return new value):\n",
+    "```cpp\n",
+    "DList<int> list = {10, 20, 30};\n",
+    "auto it = list.begin();  // Points to 10\n",
+    "auto result = ++it;      // it moves to 20, result also points to 20\n",
+    "cout << *it;             // Prints 20\n",
+    "cout << *result;         // Prints 20\n",
+    "```\n",
+    "\n",
+    "**Postfix it++** (return old value, then increment):\n",
+    "```cpp\n",
+    "DList<int> list = {10, 20, 30};\n",
+    "auto it = list.begin();  // Points to 10\n",
+    "auto result = it++;      // result points to 10, it moves to 20\n",
+    "cout << *it;             // Prints 20\n",
+    "cout << *result;         // Prints 10\n",
+    "```\n",
+    "\n",
+    "### 2. Decrement Operators (--)\n",
+    "\n",
+    "Similar to increment but moves backward:\n",
+    "```cpp\n",
+    "auto it = list.end();    // Points past last element\n",
+    "--it;                    // Now points to last element (30)\n",
+    "```\n",
+    "\n",
+    "### 3. Dereference Operator (*)\n",
+    "\n",
+    "```cpp\n",
+    "auto it = list.begin();\n",
+    "cout << *it;             // Prints the data at current position\n",
+    "*it = 100;               // Modifies the data (only for iterator, not const_iterator)\n",
+    "```\n",
+    "\n",
+    "### 4. Comparison Operators (== and !=)\n",
+    "\n",
+    "```cpp\n",
+    "auto it1 = list.begin();\n",
+    "auto it2 = list.begin();\n",
+    "auto it3 = list.end();\n",
+    "\n",
+    "cout << (it1 == it2);    // true (both point to first element)\n",
+    "cout << (it1 == it3);    // false (different positions)\n",
+    "cout << (it1 != it3);    // true (different positions)\n",
+    "```\n",
+    "\n",
+    "## Why Store Both Node* AND DList*?\n",
+    "\n",
+    "### The Problem:\n",
+    "```cpp\n",
+    "DList<int> list = {10, 20, 30};\n",
+    "auto it = list.end();    // Points to nullptr (past last element)\n",
+    "--it;                    // How do we get back to the last element (30)?\n",
+    "```\n",
+    "\n",
+    "### The Solution:\n",
+    "```cpp\n",
+    "class const_iterator {\n",
+    "private:\n",
+    "    Node* curr_;           // Points to current node\n",
+    "    const DList* myList_;  // Points to the list itself\n",
+    "};\n",
+    "```\n",
+    "\n",
+    "**With only Node*:**\n",
+    "```cpp\n",
+    "// At end(): curr_ = nullptr\n",
+    "// How to go back? No way to find the last node!\n",
+    "```\n",
+    "\n",
+    "**With Node* AND DList*:**\n",
+    "```cpp\n",
+    "const_iterator operator--() {\n",
+    "    if(curr_) {\n",
+    "        curr_ = curr_->prev_;  // Normal case: move to previous node\n",
+    "    } else {\n",
+    "        // Special case: we're at end(), go to last node\n",
+    "        if(myList_) {\n",
+    "            curr_ = myList_->back_;  // Use list pointer to find last node\n",
+    "        }\n",
+    "    }\n",
+    "    return *this;\n",
+    "}\n",
+    "```\n",
+    "\n",
+    "## Complete Implementation Breakdown\n",
+    "\n",
+    "### const_iterator Class:\n",
+    "\n",
+    "```cpp\n",
+    "class const_iterator {\n",
+    "    friend class DList;              // DList can access private members\n",
+    "    \n",
+    "private:\n",
+    "    const DList* myList_;            // Pointer to the list\n",
+    "    Node* curr_;                     // Pointer to current node\n",
+    "    \n",
+    "    // Private constructor - only DList can call this\n",
+    "    const_iterator(Node* curr, const DList* theList) {\n",
+    "        curr_ = curr;\n",
+    "        myList_ = theList;\n",
+    "    }\n",
+    "    \n",
+    "public:\n",
+    "    // Default constructor - creates \"null\" iterator\n",
+    "    const_iterator() {\n",
+    "        myList_ = nullptr;\n",
+    "        curr_ = nullptr;\n",
+    "    }\n",
+    "    \n",
+    "    // Prefix increment: ++it\n",
+    "    const_iterator operator++() {\n",
+    "        curr_ = curr_->next_;        // Move to next node\n",
+    "        return *this;                // Return reference to this iterator\n",
+    "    }\n",
+    "    \n",
+    "    // Postfix increment: it++\n",
+    "    const_iterator operator++(int) {  // int parameter distinguishes postfix\n",
+    "        const_iterator old = *this;   // Save current state\n",
+    "        curr_ = curr_->next_;         // Move to next node\n",
+    "        return old;                   // Return old state\n",
+    "    }\n",
+    "    \n",
+    "    // Prefix decrement: --it\n",
+    "    const_iterator operator--() {\n",
+    "        if(curr_) {\n",
+    "            curr_ = curr_->prev_;     // Normal case: move backward\n",
+    "        } else {\n",
+    "            // Special case: at end(), move to last element\n",
+    "            if(myList_) {\n",
+    "                curr_ = myList_->back_;\n",
+    "            }\n",
+    "        }\n",
+    "        return *this;\n",
+    "    }\n",
+    "    \n",
+    "    // Dereference: *it\n",
+    "    const T& operator*() const {\n",
+    "        return curr_->data_;          // Return reference to data\n",
+    "    }\n",
+    "    \n",
+    "    // Equality comparison: it1 == it2\n",
+    "    bool operator==(const_iterator rhs) const {\n",
+    "        // Two iterators are equal if they point to same node in same list\n",
+    "        return (myList_ == rhs.myList_ && curr_ == rhs.curr_);\n",
+    "    }\n",
+    "    \n",
+    "    // Inequality comparison: it1 != it2\n",
+    "    bool operator!=(const_iterator rhs) const {\n",
+    "        return !(*this == rhs);       // Just negate equality\n",
+    "    }\n",
+    "};\n",
+    "```\n",
+    "\n",
+    "### iterator Class (Derived):\n",
+    "\n",
+    "```cpp\n",
+    "class iterator : public const_iterator {\n",
+    "    friend class DList;\n",
+    "    \n",
+    "private:\n",
+    "    // NOTE: NO data members here!\n",
+    "    // We inherit curr_ and myList_ from const_iterator\n",
+    "    \n",
+    "    // Private constructor\n",
+    "    iterator(Node* curr, DList* theList) : const_iterator(curr, theList) {}\n",
+    "    \n",
+    "public:\n",
+    "    iterator() : const_iterator() {}   // Default constructor\n",
+    "    \n",
+    "    // Override increment to return iterator (not const_iterator)\n",
+    "    iterator operator++() {\n",
+    "        this->curr_ = this->curr_->next_;  // Need this-> because of inheritance\n",
+    "        return *this;\n",
+    "    }\n",
+    "    \n",
+    "    // Override dereference to allow modification\n",
+    "    T& operator*() {\n",
+    "        return this->curr_->data_;         // Return non-const reference\n",
+    "    }\n",
+    "    \n",
+    "    // Also provide const version\n",
+    "    const T& operator*() const {\n",
+    "        return this->curr_->data_;\n",
+    "    }\n",
+    "};\n",
+    "```\n",
+    "\n",
+    "### DList Functions:\n",
+    "\n",
+    "```cpp\n",
+    "// Return const_iterator to first element\n",
+    "const_iterator cbegin() const {\n",
+    "    return const_iterator(front_, this);\n",
+    "}\n",
+    "\n",
+    "// Return const_iterator past last element\n",
+    "const_iterator cend() const {\n",
+    "    return const_iterator(nullptr, this);\n",
+    "}\n",
+    "\n",
+    "// Return iterator to first element\n",
+    "iterator begin() {\n",
+    "    return iterator(front_, this);\n",
+    "}\n",
+    "\n",
+    "// Return iterator past last element\n",
+    "iterator end() {\n",
+    "    return iterator(nullptr, this);\n",
+    "}\n",
+    "```\n",
+    "\n",
+    "## Usage Examples:\n",
+    "\n",
+    "### Example 1: Reading a List\n",
+    "```cpp\n",
+    "DList<int> myList = {10, 20, 30};\n",
+    "\n",
+    "// Using const_iterator (read-only)\n",
+    "for(auto it = myList.cbegin(); it != myList.cend(); ++it) {\n",
+    "    cout << *it << \" \";  // Prints: 10 20 30\n",
+    "}\n",
+    "```\n",
+    "\n",
+    "### Example 2: Modifying a List\n",
+    "```cpp\n",
+    "DList<int> myList = {10, 20, 30};\n",
+    "\n",
+    "// Using iterator (can modify)\n",
+    "for(auto it = myList.begin(); it != myList.end(); ++it) {\n",
+    "    *it *= 2;  // Double each value\n",
+    "}\n",
+    "// Now list contains: {20, 40, 60}\n",
+    "```\n",
+    "\n",
+    "### Example 3: The end() Special Case\n",
+    "```cpp\n",
+    "DList<int> myList = {10, 20, 30};\n",
+    "\n",
+    "auto it = myList.end();    // Points past last element (nullptr)\n",
+    "--it;                      // Moves to last element (30)\n",
+    "cout << *it;               // Prints: 30\n",
+    "\n",
+    "++it;                      // Back to end()\n",
+    "--it;                      // Back to last element again\n",
+    "cout << *it;               // Prints: 30\n",
+    "```\n",
+    "\n",
+    "This iterator implementation allows you to traverse your linked list just like any STL container!"
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
 }
-```
-
-## const_iterator vs iterator
-
-### const_iterator = Read-Only Bookmark
-```cpp
-const_iterator it;
-*it = 100;  // ❌ ERROR! Can't modify data
-cout << *it; // ✅ OK! Can read data
-```
-
-### iterator = Read-Write Bookmark
-```cpp
-iterator it;
-*it = 100;  // ✅ OK! Can modify data
-cout << *it; // ✅ OK! Can read data
-```
-
-### When to Use Which?
-```cpp
-void printList(const DList<int>& myList) {
-    // Function receives const list, so must use const_iterator
-    for(auto it = myList.cbegin(); it != myList.cend(); it++) {
-        cout << *it;  // Can only read, not modify
-    }
-}
-
-void modifyList(DList<int>& myList) {
-    // Function receives non-const list, can use iterator
-    for(auto it = myList.begin(); it != myList.end(); it++) {
-        *it = *it * 2;  // Can modify each element
-    }
-}
-```
-
-## Class Hierarchy
-
-```cpp
-class const_iterator {  // Base class - read-only operations
-    // Can read data but not modify
-};
-
-class iterator : public const_iterator {  // Derived class - adds write ability
-    // Inherits read operations + adds write operations
-};
-```
-
-**Why this hierarchy?**
-```cpp
-iterator it1;
-const_iterator it2 = it1;  // ✅ OK! iterator can become const_iterator
-// const_iterator it3;
-// iterator it4 = it3;     // ❌ ERROR! const_iterator cannot become iterator
-```
-
-## Required Operations
-
-### 1. Increment Operators (++)
-
-**Prefix ++it** (increment first, return new value):
-```cpp
-DList<int> list = {10, 20, 30};
-auto it = list.begin();  // Points to 10
-auto result = ++it;      // it moves to 20, result also points to 20
-cout << *it;             // Prints 20
-cout << *result;         // Prints 20
-```
-
-**Postfix it++** (return old value, then increment):
-```cpp
-DList<int> list = {10, 20, 30};
-auto it = list.begin();  // Points to 10
-auto result = it++;      // result points to 10, it moves to 20
-cout << *it;             // Prints 20
-cout << *result;         // Prints 10
-```
-
-### 2. Decrement Operators (--)
-
-Similar to increment but moves backward:
-```cpp
-auto it = list.end();    // Points past last element
---it;                    // Now points to last element (30)
-```
-
-### 3. Dereference Operator (*)
-
-```cpp
-auto it = list.begin();
-cout << *it;             // Prints the data at current position
-*it = 100;               // Modifies the data (only for iterator, not const_iterator)
-```
-
-### 4. Comparison Operators (== and !=)
-
-```cpp
-auto it1 = list.begin();
-auto it2 = list.begin();
-auto it3 = list.end();
-
-cout << (it1 == it2);    // true (both point to first element)
-cout << (it1 == it3);    // false (different positions)
-cout << (it1 != it3);    // true (different positions)
-```
-
-## Why Store Both Node* AND DList*?
-
-### The Problem:
-```cpp
-DList<int> list = {10, 20, 30};
-auto it = list.end();    // Points to nullptr (past last element)
---it;                    // How do we get back to the last element (30)?
-```
-
-### The Solution:
-```cpp
-class const_iterator {
-private:
-    Node* curr_;           // Points to current node
-    const DList* myList_;  // Points to the list itself
-};
-```
-
-**With only Node*:**
-```cpp
-// At end(): curr_ = nullptr
-// How to go back? No way to find the last node!
-```
-
-**With Node* AND DList*:**
-```cpp
-const_iterator operator--() {
-    if(curr_) {
-        curr_ = curr_->prev_;  // Normal case: move to previous node
-    } else {
-        // Special case: we're at end(), go to last node
-        if(myList_) {
-            curr_ = myList_->back_;  // Use list pointer to find last node
-        }
-    }
-    return *this;
-}
-```
-
-## Complete Implementation Breakdown
-
-### const_iterator Class:
-
-```cpp
-class const_iterator {
-    friend class DList;              // DList can access private members
-    
-private:
-    const DList* myList_;            // Pointer to the list
-    Node* curr_;                     // Pointer to current node
-    
-    // Private constructor - only DList can call this
-    const_iterator(Node* curr, const DList* theList) {
-        curr_ = curr;
-        myList_ = theList;
-    }
-    
-public:
-    // Default constructor - creates "null" iterator
-    const_iterator() {
-        myList_ = nullptr;
-        curr_ = nullptr;
-    }
-    
-    // Prefix increment: ++it
-    const_iterator operator++() {
-        curr_ = curr_->next_;        // Move to next node
-        return *this;                // Return reference to this iterator
-    }
-    
-    // Postfix increment: it++
-    const_iterator operator++(int) {  // int parameter distinguishes postfix
-        const_iterator old = *this;   // Save current state
-        curr_ = curr_->next_;         // Move to next node
-        return old;                   // Return old state
-    }
-    
-    // Prefix decrement: --it
-    const_iterator operator--() {
-        if(curr_) {
-            curr_ = curr_->prev_;     // Normal case: move backward
-        } else {
-            // Special case: at end(), move to last element
-            if(myList_) {
-                curr_ = myList_->back_;
-            }
-        }
-        return *this;
-    }
-    
-    // Dereference: *it
-    const T& operator*() const {
-        return curr_->data_;          // Return reference to data
-    }
-    
-    // Equality comparison: it1 == it2
-    bool operator==(const_iterator rhs) const {
-        // Two iterators are equal if they point to same node in same list
-        return (myList_ == rhs.myList_ && curr_ == rhs.curr_);
-    }
-    
-    // Inequality comparison: it1 != it2
-    bool operator!=(const_iterator rhs) const {
-        return !(*this == rhs);       // Just negate equality
-    }
-};
-```
-
-### iterator Class (Derived):
-
-```cpp
-class iterator : public const_iterator {
-    friend class DList;
-    
-private:
-    // NOTE: NO data members here!
-    // We inherit curr_ and myList_ from const_iterator
-    
-    // Private constructor
-    iterator(Node* curr, DList* theList) : const_iterator(curr, theList) {}
-    
-public:
-    iterator() : const_iterator() {}   // Default constructor
-    
-    // Override increment to return iterator (not const_iterator)
-    iterator operator++() {
-        this->curr_ = this->curr_->next_;  // Need this-> because of inheritance
-        return *this;
-    }
-    
-    // Override dereference to allow modification
-    T& operator*() {
-        return this->curr_->data_;         // Return non-const reference
-    }
-    
-    // Also provide const version
-    const T& operator*() const {
-        return this->curr_->data_;
-    }
-};
-```
-
-### DList Functions:
-
-```cpp
-// Return const_iterator to first element
-const_iterator cbegin() const {
-    return const_iterator(front_, this);
-}
-
-// Return const_iterator past last element
-const_iterator cend() const {
-    return const_iterator(nullptr, this);
-}
-
-// Return iterator to first element
-iterator begin() {
-    return iterator(front_, this);
-}
-
-// Return iterator past last element
-iterator end() {
-    return iterator(nullptr, this);
-}
-```
-
-## Usage Examples:
-
-### Example 1: Reading a List
-```cpp
-DList<int> myList = {10, 20, 30};
-
-// Using const_iterator (read-only)
-for(auto it = myList.cbegin(); it != myList.cend(); ++it) {
-    cout << *it << " ";  // Prints: 10 20 30
-}
-```
-
-### Example 2: Modifying a List
-```cpp
-DList<int> myList = {10, 20, 30};
-
-// Using iterator (can modify)
-for(auto it = myList.begin(); it != myList.end(); ++it) {
-    *it *= 2;  // Double each value
-}
-// Now list contains: {20, 40, 60}
-```
-
-### Example 3: The end() Special Case
-```cpp
-DList<int> myList = {10, 20, 30};
-
-auto it = myList.end();    // Points past last element (nullptr)
---it;                      // Moves to last element (30)
-cout << *it;               // Prints: 30
-
-++it;                      // Back to end()
---it;                      // Back to last element again
-cout << *it;               // Prints: 30
-```
-
-This iterator implementation allows you to traverse your linked list just like any STL container!
