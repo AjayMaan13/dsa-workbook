@@ -1,0 +1,5 @@
+Add the below information in the repo:
+
+1. Hash Table Notes
+2. bft, dft of binary tree
+3. universal hash function using latex
