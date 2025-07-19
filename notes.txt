@@ -1,7 +1,7 @@
 Add the below information in the repo:
 
 1. Hash Table Notes (DONE)
-2. bft, dft of binary tree
+2. bft, dft of binary tree and Graphs
 3. universal hash function using latex (DONE)
 4. master theorum (DONE)
 5. 
