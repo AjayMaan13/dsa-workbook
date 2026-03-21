@@ -6,18 +6,24 @@ A comprehensive collection of data structures and algorithms implementations, no
 
 | Module | Topic | Key Concepts |
 |--------|-------|--------------|
-| **1.** | [Big O Notation](./1.Big_O/) | Time/Space complexity, Asymptotic analysis |
-| **2.** | [Arrays](./2.%20Arrays/) | Basic operations, Dynamic arrays, Problem solving |
-| **3.** | [Stack, Queues & Deques](./3.Stack_Queues_Deques/) | LIFO/FIFO structures, Implementation patterns |
-| **4.** | [Linked Lists](./4.Linked_List/) | Singly/Doubly linked lists, Pointers, Iterators |
-| **5.** | [Recursion & Backtracking](./5.Recursion_Backtracking/) | Recursive thinking, Memoization, Problem solving |
-| **6.** | [Searching & Sorting](./6.Searching_Sorting/) | Binary search, Sorting algorithms, Complexity analysis |
-| **7.** | [Hash Tables](./7.Hash_Table/) | Hashing functions, Collision handling, Advanced theory |
-| **8.** | [Trees](./8.Trees/) | Binary trees, Heaps, BST, Tree traversals |
-| **9.** | [Graphs](./9.Graphs/) | Graph representations, BFS/DFS, Topological sort |
-| **10.** | [Advanced Graph Algorithms](./10.Advanced_Graph_Algorighms/) | Shortest paths, MST, Dijkstra, Bellman-Ford |
-| **11.** | [Dynamic Programming](./11.Dynamic_Programming/) | *Coming Soon* |
-| **12.** | [Complexity Theory](./12.Complexity_Theory/) | *Coming Soon* |
+| **00** | [Basic](./00.Basic/) | Fundamentals, Setup |
+| **01** | [Big O Notation](./01.Big_O/) | Time/Space complexity, Asymptotic analysis |
+| **01.5** | [Searching & Sorting](./01.5.Searching_Sorting/) | Binary search, Sorting algorithms, Complexity analysis |
+| **02** | [Arrays](./02.%20Arrays/) | Basic operations, Dynamic arrays, Problem solving |
+| **03** | [Stack, Queues & Deques](./03.Stack_Queues_Deques/) | LIFO/FIFO structures, Implementation patterns |
+| **04** | [Linked Lists](./04.Linked_List/) | Singly/Doubly linked lists, Pointers, Iterators |
+| **05** | [Recursion & Backtracking](./05.Recursion_Backtracking/) | Recursive thinking, Memoization, Problem solving |
+| **06** | [Bit Manipulation](./06.Bit_manipulation/) | Bitwise ops, Tricks |
+| **07** | [Hash Tables](./07.Hash_Table/) | Hashing functions, Collision handling, Advanced theory |
+| **08** | [Sliding Window & Two Pointers](./08.Sliding_Window_and_2_Pointer/) | Subarray problems, Fast/slow pointers |
+| **09** | [Heaps](./09.Heaps/) | Min/Max heap, Priority queue, Heap sort |
+| **10** | [Greedy](./10.Greedy/) | Greedy choice, Elimination problems |
+| **11** | [Trees](./11.Trees/) | Binary trees, BST, Tree traversals |
+| **12** | [Graphs](./12.Graphs/) | Graph representations, BFS/DFS, Topological sort |
+| **13** | [Advanced Graph Algorithms](./13.Advanced_Graph_Algorighms/) | Shortest paths, MST, Dijkstra, Bellman-Ford |
+| **14** | [Dynamic Programming](./14.Dynamic_Programming/) | *Coming Soon* |
+| **15** | [Complexity Theory](./15.Complexity_Theory/) | *Coming Soon* |
+| **16** | [Miscellaneous](./16.Miscellaneous/) | Design problems, Mixed topics |
 
 ## 🚀 Features
 
