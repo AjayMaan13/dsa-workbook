@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sliding Window Master Reference</title>
+<style>
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f4f0;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-text-tertiary: #888780;
+    --color-border-tertiary: rgba(0,0,0,0.10);
+    --color-border-secondary: rgba(0,0,0,0.18);
+    --color-border-primary: rgba(0,0,0,0.28);
+    --color-background-warning: #faeeda;
+    --color-text-warning: #633806;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #1c1c1a;
+      --color-background-secondary: #252522;
+      --color-text-primary: #e8e6de;
+      --color-text-secondary: #9c9a92;
+      --color-text-tertiary: #6b6965;
+      --color-border-tertiary: rgba(255,255,255,0.08);
+      --color-border-secondary: rgba(255,255,255,0.15);
+      --color-border-primary: rgba(255,255,255,0.25);
+      --color-background-warning: #2d1e06;
+      --color-text-warning: #f9c775;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .big-title { font-size: 22px; font-weight: 500; margin-bottom: 6px; }
+  .big-sub { font-size: 14px; color: var(--color-text-secondary); margin-bottom: 2rem; line-height: 1.6; }
+  .section { margin-bottom: 2.5rem; }
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding-bottom: 10px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .section-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .section-title { font-size: 16px; font-weight: 500; }
+  .section-tag { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; margin-left: auto; }
+  .insight-box { border-radius: var(--border-radius-md); padding: 12px 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.7; }
+  .insight-label { font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+  .two-col { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin-bottom: 14px; }
+  .three-col { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; margin-bottom: 14px; }
+  @media (max-width: 600px) {
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+  .col-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .col-card-title { font-size: 12px; font-weight: 500; margin-bottom: 6px; }
+  .col-card-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.65; }
+  pre { font-family: var(--font-mono); font-size: 12px; line-height: 1.75; color: var(--color-text-primary); background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 14px 16px; white-space: pre; overflow-x: auto; margin-bottom: 12px; }
+  .hl { display: block; background: rgba(83,74,183,.09); margin: 0 -16px; padding: 0 16px; border-left: 2px solid #534AB7; }
+  .kw { color: #534AB7; }
+  .cm { color: var(--color-text-tertiary); font-style: italic; }
+  .fn { color: #0F6E56; }
+  .ex-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .ex-item { display: flex; align-items: baseline; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 13px; }
+  .ex-item:last-child { border-bottom: none; }
+  .lc { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; white-space: nowrap; }
+  .ex-text { color: var(--color-text-secondary); font-size: 12px; }
+  .key-line { font-family: var(--font-mono); font-size: 12px; font-weight: 500; padding: 8px 12px; border-radius: var(--border-radius-md); margin-bottom: 14px; border-left: 3px solid; }
+  .warn-box { border: 0.5px solid rgba(186,117,23,0.4); background: var(--color-background-warning); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 12px; color: var(--color-text-warning); margin-bottom: 12px; line-height: 1.6; }
+  .divider { height: 0.5px; background: var(--color-border-tertiary); margin: 2rem 0; }
+  .dt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .dt-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--color-text-tertiary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .dt-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: top; }
+  .dt-table tr:last-child td { border-bottom: none; }
+  .dt-q { color: var(--color-text-primary); font-weight: 500; font-size: 13px; }
+  .dt-a { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); }
+  .dt-p { font-size: 12px; font-weight: 500; }
+  .cheat { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .cheat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 14px; }
+  .cheat-pat { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .cheat-code { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .cheat-when { font-size: 11px; color: var(--color-text-tertiary); }
+  .full-card { grid-column: span 2; }
+  .trace-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px 14px; font-size: 12px; font-family: var(--font-mono); line-height: 2; }
+</style>
+</head>
+<body>
+
+<div class="big-title">All sliding window patterns</div>
+<div class="big-sub">6 patterns, fully structured with templates, recognition cues, worked logic, and LeetCode examples.<br>The only difference between patterns is <em>when you shrink</em> and <em>what you count</em>.</div>
+
+<!-- PATTERN 1 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#E1F5EE;color:#085041">1</div>
+    <div class="section-title">Fixed window size</div>
+    <span class="section-tag" style="background:#E1F5EE;color:#085041">window size = k</span>
+  </div>
+  <div class="insight-box" style="background:#E1F5EE;color:#085041">
+    <div class="insight-label">Pattern</div>
+    Window size is always k. No shrink logic needed — l is always r − k + 1. Slide the window and maintain your aggregate (sum, freq map, deque).
+  </div>
+  <div class="two-col">
+    <div>
+      <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px">Template</div>
+<pre><span class="kw">def</span> fixed_window(nums, k):
+    window_sum = <span class="fn">sum</span>(nums[:k])
+    ans = window_sum
+
+    <span class="kw">for</span> r <span class="kw">in</span> range(k, len(nums)):
+        window_sum += nums[r]
+        window_sum -= nums[r - k]  <span class="cm"># drop leftmost</span>
+<span class="hl">        ans = <span class="fn">max</span>(ans, window_sum)  <span class="cm"># or min / record</span></span>
+    <span class="kw">return</span> ans</pre>
+      <div class="key-line" style="background:#E1F5EE;color:#085041;border-color:#1D9E75">
+        Recognition: "subarray / substring of size k", "every k elements", "k consecutive"
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px">Variant — sliding window max (deque)</div>
+<pre><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+dq = deque()  <span class="cm"># stores indices, front = max</span>
+
+<span class="kw">for</span> r <span class="kw">in</span> range(len(nums)):
+    <span class="cm"># pop smaller elements from back</span>
+    <span class="kw">while</span> dq <span class="kw">and</span> nums[dq[-1]] &lt;= nums[r]:
+        dq.pop()
+    dq.append(r)
+
+    <span class="cm"># remove out-of-window index</span>
+    <span class="kw">if</span> dq[0] &lt; r - k + 1:
+        dq.popleft()
+
+    <span class="kw">if</span> r >= k - 1:
+        ans.append(nums[dq[0]])</pre>
+    </div>
+  </div>
+  <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px">LeetCode examples</div>
+  <ul class="ex-list">
+    <li class="ex-item"><span class="lc" style="background:#E1F5EE;color:#085041">LC 643</span><span class="ex-text">Maximum average subarray of size k — plain sum window</span></li>
+    <li class="ex-item"><span class="lc" style="background:#E1F5EE;color:#085041">LC 239</span><span class="ex-text">Sliding window maximum — requires monotonic deque variant</span></li>
+    <li class="ex-item"><span class="lc" style="background:#E1F5EE;color:#085041">LC 1343</span><span class="ex-text">Sub-arrays of size k with avg ≥ threshold</span></li>
+    <li class="ex-item"><span class="lc" style="background:#E1F5EE;color:#085041">LC 438</span><span class="ex-text">Find all anagrams in a string — freq map window of size p</span></li>
+  </ul>
+</div>
+
+<div class="divider"></div>
+
+<!-- PATTERN 2 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#E6F1FB;color:#0C447C">2</div>
+    <div class="section-title">Variable window — longest / maximize</div>
+    <span class="section-tag" style="background:#E6F1FB;color:#0C447C">shrink when invalid</span>
+  </div>
+  <div class="insight-box" style="background:#E6F1FB;color:#0C447C">
+    <div class="insight-label">Pattern</div>
+    Expand right freely. Only shrink from the left when the window breaks the constraint. After shrinking, the window is valid again — record the longest valid window seen.
+  </div>
+<pre><span class="kw">def</span> longest_window(s, k):
+    freq = {}
+    l = 0
+    ans = 0
+
+    <span class="kw">for</span> r <span class="kw">in</span> range(len(s)):
+        freq[s[r]] = freq.get(s[r], 0) + 1     <span class="cm"># expand</span>
+
+        <span class="kw">while</span> &lt;window is invalid&gt;:             <span class="cm"># too many distinct / sum &gt; k etc</span>
+            freq[s[l]] -= 1
+            <span class="kw">if</span> freq[s[l]] == 0: <span class="kw">del</span> freq[s[l]]
+            l += 1                               <span class="cm"># shrink</span>
+
+<span class="hl">        ans = <span class="fn">max</span>(ans, r - l + 1)               <span class="cm"># window is now valid, record</span></span>
+    <span class="kw">return</span> ans</pre>
+  <div class="three-col">
+    <div class="col-card">
+      <div class="col-card-title">Constraint: no repeats</div>
+      <div class="col-card-body">Invalid when any freq &gt; 1. LC 3.</div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title">Constraint: at most k distinct</div>
+      <div class="col-card-body">Invalid when len(freq) &gt; k. LC 340, LC 159.</div>
+    </div>
+    <div class="col-card">
+      <div class="col-card-title">Constraint: k replacements</div>
+      <div class="col-card-body">Invalid when (r−l+1) − maxFreq &gt; k. LC 424.</div>
+    </div>
+  </div>
+  <div class="key-line" style="background:#E6F1FB;color:#0C447C;border-color:#378ADD">
+    Recognition: "longest", "maximum length", "at most k [distinct / zeros / replacements]"
+  </div>
+  <ul class="ex-list">
+    <li class="ex-item"><span class="lc" style="background:#E6F1FB;color:#0C447C">LC 3</span><span class="ex-text">Longest substring without repeating characters</span></li>
+    <li class="ex-item"><span class="lc" style="background:#E6F1FB;color:#0C447C">LC 340</span><span class="ex-text">Longest substring with at most k distinct characters</span></li>
+    <li class="ex-item"><span class="lc" style="background:#E6F1FB;color:#0C447C">LC 424</span><span class="ex-text">Longest repeating character replacement</span></li>
+    <li class="ex-item"><span class="lc" style="background:#E6F1FB;color:#0C447C">LC 1004</span><span class="ex-text">Max consecutive ones III — k flips allowed</span></li>
+  </ul>
+</div>
+
+<div class="divider"></div>
+
+<!-- PATTERN 3 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#FAECE7;color:#712B13">3</div>
+    <div class="section-title">Variable window — minimum / shortest</div>
+    <span class="section-tag" style="background:#FAECE7;color:#712B13">shrink when valid</span>
+  </div>
+  <div class="insight-box" style="background:#FAECE7;color:#712B13">
+    <div class="insight-label">Pattern — the flip</div>
+    The shrink condition is reversed compared to pattern 2. Expand until the window satisfies the condition, then shrink from the left to minimize it, recording each valid window before removing the left element.
+  </div>
+<pre><span class="kw">def</span> minimum_window(s, t):
+    need = {}
+    <span class="kw">for</span> c <span class="kw">in</span> t: need[c] = need.get(c, 0) + 1
+    have, required = 0, len(need)
+    window = {}; l = 0; ans = ""
+
+    <span class="kw">for</span> r <span class="kw">in</span> range(len(s)):
+        window[s[r]] = window.get(s[r], 0) + 1    <span class="cm"># expand</span>
+        <span class="kw">if</span> s[r] <span class="kw">in</span> need <span class="kw">and</span> window[s[r]] == need[s[r]]:
+            have += 1
+
+<span class="hl">        <span class="kw">while</span> have == required:                   <span class="cm"># valid! shrink to minimize</span></span>
+            <span class="kw">if not</span> ans <span class="kw">or</span> r-l+1 &lt; len(ans):
+                ans = s[l:r+1]                    <span class="cm"># record BEFORE shrinking</span>
+            <span class="kw">if</span> s[l] <span class="kw">in</span> need:
+                <span class="kw">if</span> window[s[l]] == need[s[l]]: have -= 1
+            window[s[l]] -= 1
+            l += 1
+    <span class="kw">return</span> ans</pre>
+  <div class="warn-box">
+    Key difference from longest: you update the answer INSIDE the shrink loop, not after it. You shrink while valid, recording each improvement.
+  </div>
+  <ul class="ex-list">
+    <li class="ex-item"><span class="lc" style="background:#FAECE7;color:#712B13">LC 76</span><span class="ex-text">Minimum window substring — classic template problem</span></li>
+    <li class="ex-item"><span class="lc" style="background:#FAECE7;color:#712B13">LC 209</span><span class="ex-text">Minimum size subarray sum — sum ≥ target, shrink when sum is big enough</span></li>
+    <li class="ex-item"><span class="lc" style="background:#FAECE7;color:#712B13">LC 1234</span><span class="ex-text">Replace the substring for balanced string</span></li>
+  </ul>
+</div>
+
+<div class="divider"></div>
+
+<!-- PATTERN 4 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#EEEDFE;color:#3C3489">4</div>
+    <div class="section-title">Count subarrays — at most k</div>
+    <span class="section-tag" style="background:#EEEDFE;color:#3C3489">count += r − l + 1</span>
+  </div>
+  <div class="insight-box" style="background:#EEEDFE;color:#3C3489">
+    <div class="insight-label">The key insight</div>
+    After shrinking so the window [l..r] is valid, every subarray ending at r and starting anywhere from l to r is also valid (fewer elements = easier to satisfy). That's r−l+1 subarrays counted in one line. This makes it O(n) instead of O(n²).
+  </div>
+<pre><span class="kw">def</span> at_most(arr, k):
+    <span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+    freq = defaultdict(int)
+    distinct = 0
+    count = 0
+    l = 0
+
+    <span class="kw">for</span> r <span class="kw">in</span> range(len(arr)):
+        freq[arr[r]] += 1
+        <span class="kw">if</span> freq[arr[r]] == 1:         <span class="cm"># new element entered window</span>
+            distinct += 1
+
+        <span class="kw">while</span> distinct &gt; k:            <span class="cm"># shrink until valid</span>
+            freq[arr[l]] -= 1
+            <span class="kw">if</span> freq[arr[l]] == 0:
+                distinct -= 1
+            l += 1
+
+<span class="hl">        count += r - l + 1            <span class="cm"># ALL subarrays ending at r</span></span>
+
+    <span class="kw">return</span> count</pre>
+  <div class="key-line" style="background:#EEEDFE;color:#3C3489;border-color:#534AB7">
+    The shrink condition is &gt; k (not &gt;= k). Using &gt;= would shrink too far and give you atMost(k−1) by accident.
+  </div>
+  <ul class="ex-list">
+    <li class="ex-item"><span class="lc" style="background:#EEEDFE;color:#3C3489">LC 992</span><span class="ex-text">Subarrays with K different integers — uses atMost as building block</span></li>
+    <li class="ex-item"><span class="lc" style="background:#EEEDFE;color:#3C3489">LC 1248</span><span class="ex-text">Count nice subarrays — uses atMost with odd count instead of distinct</span></li>
+    <li class="ex-item"><span class="lc" style="background:#EEEDFE;color:#3C3489">LC 2401</span><span class="ex-text">Longest nice subarray — atMost with bitwise OR constraint</span></li>
+  </ul>
+</div>
+
+<div class="divider"></div>
+
+<!-- PATTERN 5 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#EEEDFE;color:#3C3489">5</div>
+    <div class="section-title">Count subarrays — exactly k</div>
+    <span class="section-tag" style="background:#EEEDFE;color:#3C3489">atMost(k) − atMost(k−1)</span>
+  </div>
+  <div class="insight-box" style="background:#EEEDFE;color:#3C3489">
+    <div class="insight-label">Why you can't count exactly k directly</div>
+    "Exactly k" is not monotone — expanding can break the condition, shrinking can also break it. There's no clean invariant. Instead: atMost(k) counts windows with 1,2,…k. atMost(k−1) counts 1,2,…k−1. Their difference is exactly k.
+  </div>
+  <div class="two-col">
+    <div>
+<pre><span class="kw">def</span> exactly_k(arr, k):
+    <span class="kw">return</span> at_most(arr, k) - at_most(arr, k - 1)
+
+<span class="cm"># at_most is the function from Pattern 4.</span>
+<span class="cm"># The subtraction cancels everything</span>
+<span class="cm"># except windows with exactly k.</span>
+
+<span class="cm"># Adapt at_most for different constraints:</span>
+<span class="cm">#   distinct count → track len(freq)</span>
+<span class="cm">#   odd numbers   → track count of odds</span>
+<span class="cm">#   zeros         → track count of zeros</span></pre>
+
+<pre><span class="cm"># Nice subarrays (k odds) variant:</span>
+<span class="kw">def</span> number_of_subarrays(nums, k):
+    <span class="kw">def</span> at_most_odds(k):
+        odds = 0; count = 0; l = 0
+        <span class="kw">for</span> r <span class="kw">in</span> range(len(nums)):
+            <span class="kw">if</span> nums[r] % 2 == 1:
+                odds += 1
+            <span class="kw">while</span> odds &gt; k:
+                <span class="kw">if</span> nums[l] % 2 == 1: odds -= 1
+                l += 1
+            count += r - l + 1
+        <span class="kw">return</span> count
+    <span class="kw">return</span> at_most_odds(k) - at_most_odds(k-1)</pre>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px">Step-by-step trace — [1,2,1,2,3], k=2</div>
+      <div class="trace-box">
+        <div style="color:var(--color-text-tertiary);margin-bottom:4px">atMost(2) trace:</div>
+        <div>r=0 l=0 win=[1]       +1 → 1</div>
+        <div>r=1 l=0 win=[1,2]     +2 → 3</div>
+        <div>r=2 l=0 win=[1,2,1]   +3 → 6</div>
+        <div>r=3 l=0 win=[1,2,1,2] +4 → 10</div>
+        <div>r=4 l=3 win=[2,3]     +2 → 12</div>
+        <div style="color:var(--color-text-tertiary);margin-top:8px">atMost(1) = 5</div>
+        <div style="color:#3C3489;font-weight:500">exactly(2) = 12 − 5 = 7 ✓</div>
+      </div>
+    </div>
+  </div>
+  <ul class="ex-list">
+    <li class="ex-item"><span class="lc" style="background:#EEEDFE;color:#3C3489">LC 992</span><span class="ex-text">Subarrays with K different integers — Hard, the classic exactly-k problem</span></li>
+    <li class="ex-item"><span class="lc" style="background:#EEEDFE;color:#3C3489">LC 1248</span><span class="ex-text">Count number of nice subarrays — k odd numbers</span></li>
+    <li class="ex-item"><span class="lc" style="background:#EEEDFE;color:#3C3489">LC 930</span><span class="ex-text">Binary subarrays with sum — also solvable with prefix sum</span></li>
+  </ul>
+</div>
+
+<div class="divider"></div>
+
+<!-- PATTERN 6 -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:#FAEEDA;color:#633806">6</div>
+    <div class="section-title">Count subarrays — at least k &amp; prefix sum</div>
+    <span class="section-tag" style="background:#FAEEDA;color:#633806">complement or hashmap</span>
+  </div>
+  <div class="two-col">
+    <div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">At least k — two approaches</div>
+      <div class="insight-box" style="background:#FAEEDA;color:#633806">
+        <div class="insight-label">Mirror of atMost</div>
+        Once the window satisfies "at least k", extending right always keeps it valid. So count += n − r for every valid starting position.
+      </div>
+<pre><span class="cm"># Option A: direct count</span>
+<span class="kw">while</span> valid:
+    count += n - r    <span class="cm"># all right extensions</span>
+    <span class="cm"># remove arr[l]</span>
+    l += 1
+
+<span class="cm"># Option B: complement (simpler)</span>
+<span class="kw">def</span> at_least(arr, k):
+    n = len(arr)
+    total = n * (n + 1) // 2
+    <span class="kw">return</span> total - at_most(arr, k - 1)</pre>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:8px">Prefix sum — when window breaks</div>
+      <div class="insight-box" style="background:#E6F1FB;color:#0C447C">
+        <div class="insight-label">Use when you have negatives</div>
+        With negative numbers, shrinking a window can increase the sum — the window is no longer monotone. Sliding window fails. Use prefix sums instead.
+      </div>
+<pre><span class="kw">def</span> subarray_sum_k(nums, k):
+    prefix_count = {0: 1}   <span class="cm"># init: empty prefix</span>
+    prefix = 0; count = 0
+
+    <span class="kw">for</span> num <span class="kw">in</span> nums:
+        prefix += num
+<span class="hl">        count += prefix_count.get(prefix-k, 0)</span>
+        prefix_count[prefix] = \
+            prefix_count.get(prefix, 0) + 1
+
+    <span class="kw">return</span> count
+
+<span class="cm"># sum(l..r) = prefix[r] - prefix[l-1] = k</span>
+<span class="cm"># → prefix[l-1] = prefix[r] - k</span>
+<span class="cm"># → count past prefixes = current - k</span></pre>
+    </div>
+  </div>
+  <div class="warn-box">
+    The <code>prefix_count[0] = 1</code> initialization is not optional. Without it, subarrays that start from index 0 (where prefix[l-1] = 0) are missed entirely.
+  </div>
+  <ul class="ex-list">
+    <li class="ex-item"><span class="lc" style="background:#FAEEDA;color:#633806">LC 2799</span><span class="ex-text">Count complete subarrays — at-least using complement</span></li>
+    <li class="ex-item"><span class="lc" style="background:#FAEEDA;color:#633806">LC 1358</span><span class="ex-text">Number of substrings containing all 3 chars — count += n−r</span></li>
+    <li class="ex-item"><span class="lc" style="background:#FAEEDA;color:#633806">LC 560</span><span class="ex-text">Subarray sum equals k — prefix sum, handles negatives</span></li>
+    <li class="ex-item"><span class="lc" style="background:#FAEEDA;color:#633806">LC 525</span><span class="ex-text">Contiguous array — prefix sum, equal 0s and 1s</span></li>
+    <li class="ex-item"><span class="lc" style="background:#FAEEDA;color:#633806">LC 974</span><span class="ex-text">Subarray sums divisible by k — prefix sum with modulo</span></li>
+  </ul>
+</div>
+
+<div class="divider"></div>
+
+<!-- DECISION TREE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--color-background-secondary);color:var(--color-text-primary)">?</div>
+    <div class="section-title">Master decision tree</div>
+  </div>
+  <table class="dt-table">
+    <thead>
+      <tr>
+        <th style="width:38%">Ask yourself</th>
+        <th style="width:28%">Answer → pattern</th>
+        <th style="width:34%">Key formula</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="dt-q">Is window size fixed (given k)?</td>
+        <td class="dt-p" style="color:#085041">Fixed window</td>
+        <td class="dt-a">window_sum += arr[r] − arr[r−k]</td>
+      </tr>
+      <tr>
+        <td class="dt-q">Want the longest / max window?</td>
+        <td class="dt-p" style="color:#0C447C">Variable — longest</td>
+        <td class="dt-a">shrink while invalid → ans = max(r−l+1)</td>
+      </tr>
+      <tr>
+        <td class="dt-q">Want the shortest / min window?</td>
+        <td class="dt-p" style="color:#712B13">Variable — minimum</td>
+        <td class="dt-a">shrink while valid → ans = min(r−l+1)</td>
+      </tr>
+      <tr>
+        <td class="dt-q">Count subarrays with at most k?</td>
+        <td class="dt-p" style="color:#3C3489">atMost</td>
+        <td class="dt-a">count += r − l + 1</td>
+      </tr>
+      <tr>
+        <td class="dt-q">Count subarrays with exactly k?</td>
+        <td class="dt-p" style="color:#3C3489">Exactly = two atMost</td>
+        <td class="dt-a">atMost(k) − atMost(k−1)</td>
+      </tr>
+      <tr>
+        <td class="dt-q">Count subarrays with at least k?</td>
+        <td class="dt-p" style="color:#633806">Complement</td>
+        <td class="dt-a">total − atMost(k−1)  or  count += n−r</td>
+      </tr>
+      <tr>
+        <td class="dt-q">Has negative numbers? Sum constraint?</td>
+        <td class="dt-p" style="color:#0C447C">Prefix sum</td>
+        <td class="dt-a">count += freq[prefix − k]</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- CHEAT SHEET -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-num" style="background:var(--color-background-secondary);color:var(--color-text-primary)">★</div>
+    <div class="section-title">Memorize these — the full cheat sheet</div>
+  </div>
+  <div class="cheat">
+    <div class="cheat-card">
+      <div class="cheat-pat">Longest</div>
+      <div class="cheat-code">shrink while invalid</div>
+      <div class="cheat-when">ans = max(ans, r−l+1) after loop</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-pat">Minimum window</div>
+      <div class="cheat-code">shrink while valid</div>
+      <div class="cheat-when">ans = min inside shrink loop</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-pat">At most k</div>
+      <div class="cheat-code">count += r − l + 1</div>
+      <div class="cheat-when">shrink condition: &gt; k (not &gt;= k)</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-pat">At least k</div>
+      <div class="cheat-code">count += n − r</div>
+      <div class="cheat-when">or: total − atMost(k−1)</div>
+    </div>
+    <div class="cheat-card full-card">
+      <div class="cheat-pat">Exactly k</div>
+      <div class="cheat-code">atMost(k) − atMost(k−1)</div>
+      <div class="cheat-when">works for any monotone constraint (distinct, odds, zeros, …)</div>
+    </div>
+    <div class="cheat-card full-card">
+      <div class="cheat-pat">Prefix sum (negatives / sums)</div>
+      <div class="cheat-code">prefix_count[0]=1 → count += freq[prefix−k]</div>
+      <div class="cheat-when">use when sliding window can't shrink monotonically</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
